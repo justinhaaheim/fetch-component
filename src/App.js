@@ -1,32 +1,48 @@
-/* eslint-disable react/prefer-stateless-function */
+/* eslint-disable react/prefer-stateless-function, react/no-multi-comp, no-unused-expressions */
 
 import React, { Component } from 'react'
 import logo from './logo.svg'
 import spinner from './spinner.svg'
 import './App.css'
 
-class App extends Component {
+class Fetch extends Component {
   constructor(props) {
     super(props)
     this.state = {
       loading: true,
-      user: null,
-      followers: [],
+      data: null,
     }
   }
 
   componentDidMount() {
-    const url = 'https://api.github.com/users/prattsj'
+    const { url } = this.props
 
     fetch(url)
       .then(response => response.json())
-      .then((user) => {
-        this.setState({ user, loading: false })
+      .then((data) => {
+        this.setState({ data, loading: false })
       })
   }
 
   render() {
-    const { user } = this.state
+    const { loading } = this.state
+
+    return loading ? (
+      <img src={spinner} alt="Loading..." height="60px" />
+    ) : (
+      this.props.children(this.state)
+    )
+  }
+}
+
+class App extends Component {
+  constructor(props) {
+    super(props)
+    null
+  }
+
+  render() {
+    const url = 'https://api.github.com/users/prattsj'
 
     return (
       <div className="App">
@@ -34,16 +50,30 @@ class App extends Component {
           <img src={logo} className="App-logo" alt="logo" />
         </header>
         <p className="App-intro">
-          {
-            user ? (
+          <Fetch url={url}>
+            {({ data: user }) => (
               <div>
                 <h1>GitHub User: {user.login} </h1>
                 <h2>Followers: {user.followers} </h2>
+                <div style={{ width: '420px', margin: 'auto', lineHeight: '0px' }}>
+                  <Fetch url={user.followers_url}>
+                    {({ data: followers }) =>
+                      followers.map((follower, i) => (
+                        <img
+                          src={follower.avatar_url}
+                          height="80px"
+                          width="80px"
+                          key={i}
+                          alt="follower"
+                          style={{ margin: '0px' }}
+                        />
+                      ))
+                    }
+                  </Fetch>
+                </div>
               </div>
-            ) : (
-              <img src={spinner} className="App-logo" alt="Loading..." height="120px" />
-            )
-          }
+            )}
+          </Fetch>
         </p>
       </div>
     )
