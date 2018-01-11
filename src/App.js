@@ -49,13 +49,13 @@ class App extends Component {
         <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
         </header>
-        <p className="App-intro">
+        <div className="App-intro">
           <Fetch url={url}>
             {({ data: user }) => (
               <div>
                 <h1>GitHub User: {user.login} </h1>
                 <h2>Followers: {user.followers} </h2>
-                <div style={{ width: '420px', margin: 'auto', lineHeight: '0px' }}>
+                <div className="image-grid">
                   <Fetch url={user.followers_url}>
                     {({ data: followers }) =>
                       followers.map((follower, i) => (
@@ -63,9 +63,8 @@ class App extends Component {
                           src={follower.avatar_url}
                           height="80px"
                           width="80px"
-                          key={i}
+                          key={follower.id}
                           alt="follower"
-                          style={{ margin: '0px' }}
                         />
                       ))
                     }
@@ -74,7 +73,7 @@ class App extends Component {
               </div>
             )}
           </Fetch>
-        </p>
+        </div>
       </div>
     )
   }
